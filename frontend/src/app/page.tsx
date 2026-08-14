@@ -213,8 +213,10 @@ export default function HomePage() {
   }, [sendFrame])
 
   const connectWebSocket = useCallback(() => {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'localhost:8000'
+    const configuredBackendUrl = (process.env.NEXT_PUBLIC_BACKEND_URL || 'localhost:8000').trim().replace(/\/+$/, '')
+    const isSecureBackend = configuredBackendUrl.startsWith('https://')
+    const protocol = isSecureBackend || window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+    const backendUrl = configuredBackendUrl.replace(/^https?:\/\//, '')
     const url = `${protocol}//${backendUrl}/ws`
     const ws = new WebSocket(url)
     wsRef.current = ws
