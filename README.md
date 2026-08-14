@@ -170,7 +170,7 @@ This project estimates visible facial expressions; it should not be considered a
 
 ### 1. Project Overview
 
-![Project Overview](docs/images/project-overview-final.png)
+![Project Overview](docs/images/project-overview.png)
 
 ### 2. Application Architecture
 
