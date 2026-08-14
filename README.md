@@ -169,13 +169,13 @@ This project estimates visible facial expressions; it should not be considered a
 ## Project Screenshots and Architecture
 
 <h3>1. Project Overview</h3>
-<img src="https://raw.githubusercontent.com/kalyan870/face-emotion/main/docs/images/project-overview.png?v=4" alt="Project Overview" width="100%" />
+<img src="https://raw.githubusercontent.com/kalyan870/face-emotion/main/docs/images/project-overview.png" alt="Project Overview" width="100%" />
 
 <h3>2. Application Architecture</h3>
-<img src="https://raw.githubusercontent.com/kalyan870/face-emotion/main/docs/images/application-architecture.png?v=4" alt="Application Architecture" width="100%" />
+<img src="https://raw.githubusercontent.com/kalyan870/face-emotion/main/docs/images/application-architecture.png" alt="Application Architecture" width="100%" />
 
 <h3>3. Final Architecture</h3>
-<img src="https://raw.githubusercontent.com/kalyan870/face-emotion/main/docs/images/final-architecture.png?v=4" alt="Final Architecture" width="100%" />
+<img src="https://raw.githubusercontent.com/kalyan870/face-emotion/main/docs/images/final-architecture.png" alt="Final Architecture" width="100%" />
 ## License
 
 MIT License
