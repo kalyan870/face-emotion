@@ -1,206 +1,191 @@
-# Face Emotion Recognition
+# Face Emotion AI
 
-Real-time face detection and emotion recognition powered by AI. Built for hackathons with a modern, clean UI.
+Face Emotion AI is a real-time computer vision web application that detects faces through a webcam, tracks facial landmarks, analyzes facial expressions, and provides real-time emotion analytics.
 
-![Demo](https://img.shields.io/badge/Status-Ready%20for%20Hackathon-brightgreen)
-![Next.js](https://img.shields.io/badge/Next.js-14-black)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688)
-![MediaPipe](https://img.shields.io/badge/MediaPipe-Face%20Mesh-orange)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
-![Tailwind](https://img.shields.io/badge/Tailwind-3-38B2AC)
+The application combines **Next.js, React, TypeScript, Python, FastAPI, MediaPipe, and Recharts** to create an interactive AI-powered dashboard.
+
+## Live Demo
+
+- **Frontend:** [face-emotion-frontend.vercel.app](https://face-emotion-frontend.vercel.app)
+- **Backend:** [face-emotion-backend-q6ra.onrender.com](https://face-emotion-backend-q6ra.onrender.com)
 
 ## Features
 
-- **Real-time face detection** using MediaPipe Face Mesh (468 landmarks)
-- **7 emotion classification**: Happy, Sad, Angry, Surprise, Fear, Disgust, Neutral
-- **Low-latency WebSocket streaming** for real-time processing
-- **Modern, responsive UI** with Tailwind CSS and dark mode support
-- **Privacy-first**: All processing happens locally on your machine
-- **Hackathon-ready**: Clean codebase, well-documented, easy to extend
+- Real-time webcam face detection
+- 468 facial landmark detection
+- Real-time facial expression analysis
+- Seven emotion categories: Happy, Sad, Angry, Surprise, Fear, Disgust, and Neutral
+- Emotion confidence scores
+- Real-time FPS and latency monitoring
+- Frame and face counting
+- Emotion distribution and trend charts
+- Recent detection history and session analytics
+- CSV and JSON export
+- Clear session data
+- Privacy-focused local processing
 
-## Tech Stack
+## Technology Stack
 
 ### Frontend
-- **Next.js 14** (App Router, TypeScript)
-- **Tailwind CSS** for styling
-- **Lucide React** for icons
-- **WebSocket** for real-time communication
+
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
 
 ### Backend
-- **FastAPI** for high-performance API
-- **MediaPipe** for face mesh detection
-- **OpenCV** for image processing
-- **WebSockets** for low-latency streaming
-- **Heuristic-based emotion detection** (no ML model required)
 
-## Quick Start
+- Python
+- FastAPI
+
+### AI and Computer Vision
+
+- MediaPipe Face Landmarker
+- 468 facial landmarks
+- Real-time face tracking
+
+### Data Visualization and Browser APIs
+
+- Recharts
+- WebRTC
+- `getUserMedia()`
+- Webcam API
+- Canvas and Video APIs
+
+## How It Works
+
+1. **Webcam input** — the browser captures the live video stream.
+2. **Face detection** — incoming frames are processed to detect faces in real time.
+3. **Facial landmarks** — MediaPipe tracks 468 landmarks for each detected face.
+4. **Feature analysis** — landmark data is analyzed for expression-related features.
+5. **Emotion recognition** — the expression is classified into one of seven emotions.
+6. **Real-time dashboard** — emotion, confidence, FPS, latency, frames, and face count are displayed.
+7. **Analytics** — the dashboard provides distributions, trends, recent detections, and session statistics.
+8. **Data export** — detection information can be exported as CSV or JSON.
+
+## Dashboard
+
+- **Live detection:** webcam preview, face detection, landmarks, current emotion, and confidence
+- **Emotion analytics:** distribution, trends, recent detections, and session statistics
+- **Performance monitoring:** FPS, latency, processed frames, detected faces, and connection status
+- **Data management:** detection history, CSV export, JSON export, and session clearing
+
+## Installation
 
 ### Prerequisites
-- Python 3.10+
-- Node.js 18+
-- Webcam
 
-### Automated Setup (Windows PowerShell)
-```powershell
-# Run as Administrator
-cd C:\Users\KALYAN\Projects\face-emotion
-.\start.ps1
-```
+- Node.js and npm
+- Python and pip
+- Git
+- A modern web browser
+- A webcam
 
-### Manual Setup
+### Frontend setup
 
-#### Backend
-```bash
-cd backend
-python -m venv venv
-# Windows
-venv\Scripts\activate
-# macOS/Linux
-source venv/bin/activate
-
-pip install -r requirements.txt
-python main.py
-```
-
-#### Frontend
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-### Access
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:8000
-- **API Docs**: http://localhost:8000/docs
+Open [http://localhost:3000](http://localhost:3000) and allow camera access when requested.
+
+### Backend setup
+
+```bash
+cd backend
+python -m venv venv
+```
+
+On Windows:
+
+```powershell
+venv\Scripts\activate
+```
+
+On macOS/Linux:
+
+```bash
+source venv/bin/activate
+```
+
+Then install and run the API:
+
+```bash
+pip install -r requirements.txt
+uvicorn main:app --reload
+```
 
 ## Project Structure
 
-```
+```text
 face-emotion/
 ├── backend/
-│   ├── main.py              # FastAPI app with WebSocket endpoint
-│   └── requirements.txt     # Python dependencies
+│   ├── main.py
+│   ├── requirements.txt
+│   └── render.yaml
 ├── frontend/
 │   ├── src/
-│   │   ├── app/
-│   │   │   ├── globals.css  # Tailwind + custom styles
-│   │   │   ├── layout.tsx   # Root layout
-│   │   │   └── page.tsx     # Main page with video feed
-│   │   ├── components/
-│   │   │   ├── ConnectionStatus.tsx
-│   │   │   ├── EmotionBadge.tsx
-│   │   │   ├── FaceOverlay.tsx
-│   │   │   └── StatsPanel.tsx
-│   │   ├── lib/
-│   │   │   └── utils.ts     # Utility functions
-│   │   └── hooks/           # Custom React hooks
 │   ├── package.json
-│   ├── tailwind.config.ts
 │   └── tsconfig.json
-├── start.ps1                # Windows startup script
-��── README.md
+├── docs/
+│   └── images/
+└── README.md
 ```
 
-## API Endpoints
+## Deployment
 
-### WebSocket
-```
-ws://localhost:8000/ws
-```
-Send base64-encoded JPEG frames:
-```json
-{
-  "type": "frame",
-  "data": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQ...",
-  "timestamp": 1234567890
-}
-```
+The backend is deployed on Render and the frontend is deployed on Vercel. The frontend uses the `NEXT_PUBLIC_BACKEND_URL` environment variable to connect to the Render WebSocket API.
 
-Receive emotion results:
-```json
-{
-  "type": "results",
-  "faces": [
-    {
-      "landmarks": [...],
-      "bbox": {"x": 100, "y": 50, "width": 200, "height": 200},
-      "emotion": "Happy",
-      "confidence": 0.85
-    }
-  ],
-  "timestamp": 1234567890
-}
-```
+The MediaPipe model is downloaded automatically by the backend at startup.
 
-### REST
-```
-POST /analyze
-```
-Upload an image file for batch processing.
+## Privacy and Limitations
 
-## Extending the Project
+The core computer-vision processing is designed to run locally in the browser. The live webcam feed does not need to be uploaded to an external AI service for the core face-landmark detection experience.
 
-### Add Custom Emotion Model
-1. Train a model on FER2013 or similar dataset
-2. Save as `emotion_model.h5` in backend folder
-3. The backend will auto-detect and use it
+This project estimates visible facial expressions; it should not be considered a definitive measurement of a person's internal emotional state. Results can vary with lighting, camera angle, facial position, camera quality, occlusion, and expression intensity.
 
-### Add More Emotions
-1. Update `EMOTION_LABELS` in `main.py`
-2. Add colors/icons in `page.tsx`
-3. Retrain model if using custom
+## Applications
 
-## Deploy to Cloud
+- Human-computer interaction
+- Accessibility applications
+- Educational technology
+- Customer experience prototypes
+- Computer vision demonstrations
+- AI/ML projects
+- Hackathons and research prototypes
 
-This app has two deployable parts. The model file is auto-downloaded on backend startup, so nothing large is committed.
+## Future Improvements
 
-### 1. Backend (Render / Railway)
+- Improved emotion models
+- Multi-face analytics
+- Persistent database storage
+- Historical session comparison
+- PDF report generation
+- Mobile optimization
+- Improved low-light detection
+- Advanced analytics
 
-**Render** (free tier, easiest):
-1. Push this repo to GitHub
-2. In Render → **New → Web Service**, connect the repo
-3. Root directory: `backend`, Runtime: `Python 3`
-4. Build: `pip install -r requirements.txt`
-5. Start: `uvicorn main:app --host 0.0.0.0 --port 10000`
-6. Health check path: `/health`
+## Project Screenshots and Architecture
 
-A `backend/render.yaml` blueprint is included for one-click deploy:
-1. Render → **New → Blueprint**, connect repo, choose `render.yaml`
+### 1. Project Overview
 
-**Railway**:
-- Root directory: `backend`, Build: `pip install -r requirements.txt`
-- Start: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+![Project Overview](docs/images/project-overview.png)
 
-### 2. Frontend (Vercel)
-1. In Vercel → **Add New → Project**, connect repo, root directory: `frontend`
-2. Add environment variable: `NEXT_PUBLIC_BACKEND_URL=<your-backend-hostname>` (e.g. `face-emotion-backend.onrender.com`, **no** `http://` and **no** trailing slash)
-3. Deploy. The app automatically uses `wss://` on https and `ws://` on http.
+### 2. Application Architecture
 
-> If the variable is missing, it falls back to `localhost:8000` for local dev.
+![Application Architecture](docs/images/application-architecture.png)
 
-### Local dev with a remote backend
-```bash
-cd frontend
-$env:NEXT_PUBLIC_BACKEND_URL="face-emotion-backend.onrender.com"
-npm run dev
-```
+### 3. Final Architecture
 
-## Hackathon Tips
-
-1. **Demo Preparation**: Record a 30-second video of the app working
-2. **Unique Angle**: Emphasize privacy (local processing) and real-time performance
-3. **Extensions to Impress**:
-   - Add emotion history timeline
-   - Multi-face emotion comparison
-   - Export session data as CSV/JSON
-   - Add voice feedback for emotions
-   - Integrate with a chatbot for empathetic responses
+![Final Architecture](docs/images/final-architecture.png)
 
 ## License
 
-MIT License - Feel free to use for hackathons and personal projects!
+MIT License
 
-## Contributing
+## Author
 
-PRs welcome! Please read the code style guidelines in each folder before contributing.
+Kalyan
+
+**Face Emotion AI — Real-Time Facial Emotion Recognition & Analytics Dashboard**
