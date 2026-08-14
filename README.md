@@ -174,11 +174,11 @@ This project estimates visible facial expressions; it should not be considered a
 
 ### 2. Application Architecture
 
-![Application Architecture](docs/images/application-architecture.png)
+<img src="https://raw.githubusercontent.com/kalyan870/face-emotion/main/docs/images/application-architecture.png?v=2" alt="Application Architecture" />
 
 ### 3. Final Architecture
 
-![Final Architecture](docs/images/final-architecture.png)
+<img src="https://raw.githubusercontent.com/kalyan870/face-emotion/main/docs/images/final-architecture.png?v=2" alt="Final Architecture" />
 
 ## License
 
