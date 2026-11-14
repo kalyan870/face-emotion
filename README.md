@@ -22,7 +22,7 @@ The application combines **Next.js, React, TypeScript, Python, FastAPI, MediaPip
 - Recent detection history and session analytics
 - CSV and JSON export
 - Clear session data
-- Privacy-focused local processing
+- Webcam frames are sent to the configured FastAPI backend for processing; backend origins and frame sizes are restricted
 
 ## Technology Stack
 
@@ -58,7 +58,7 @@ The application combines **Next.js, React, TypeScript, Python, FastAPI, MediaPip
 2. **Face detection** — incoming frames are processed to detect faces in real time.
 3. **Facial landmarks** — MediaPipe tracks 468 landmarks for each detected face.
 4. **Feature analysis** — landmark data is analyzed for expression-related features.
-5. **Emotion recognition** — the expression is classified into one of seven emotions.
+5. **Expression heuristic** — blendshape scores are mapped to one of seven expression labels. These heuristics do not measure a person's internal emotional state and should not be used for consequential decisions.
 6. **Real-time dashboard** — emotion, confidence, FPS, latency, frames, and face count are displayed.
 7. **Analytics** — the dashboard provides distributions, trends, recent detections, and session statistics.
 8. **Data export** — detection information can be exported as CSV or JSON.
@@ -137,11 +137,11 @@ face-emotion/
 
 The backend is deployed on Render and the frontend is deployed on Vercel. The frontend uses the `NEXT_PUBLIC_BACKEND_URL` environment variable to connect to the Render WebSocket API.
 
-The MediaPipe model is downloaded automatically by the backend at startup.
+The MediaPipe model is downloaded automatically by the backend at startup. Webcam frames travel from the browser to the configured backend over WebSocket for inference. Configure `ALLOWED_ORIGINS` on the backend as a comma-separated list of trusted browser origins; the defaults include the published Vercel frontend and local development. Frames larger than 5 MB or 1920×1080 are rejected, and the browser scales outgoing frames to at most 1280×720. Session records and thumbnails are held in browser memory unless the user exports them.
 
 ## Privacy and Limitations
 
-The core computer-vision processing is designed to run locally in the browser. The live webcam feed does not need to be uploaded to an external AI service for the core face-landmark detection experience.
+Webcam frames are transmitted over WebSocket to the configured backend for inference. Configure the backend's trusted browser origins with `ALLOWED_ORIGINS`. Expression labels are heuristic interpretations of facial blendshapes, not reliable measurements of internal feelings; do not use them for hiring, health, education, or other consequential decisions.
 
 This project estimates visible facial expressions; it should not be considered a definitive measurement of a person's internal emotional state. Results can vary with lighting, camera angle, facial position, camera quality, occlusion, and expression intensity.
 

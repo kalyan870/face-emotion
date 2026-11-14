@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Eye, Clock, ChevronRight, ChevronLeft } from 'lucide-react'
 import { DetectionRecord, EMOTION_COLORS } from '@/lib/types'
 import { cn } from '@/lib/utils'
+import Image from 'next/image'
 
 interface RecentDetectionsProps {
   records: DetectionRecord[]
@@ -40,9 +41,12 @@ export function RecentDetections({ records, className }: RecentDetectionsProps) 
       {paged.map((record) => (
         <div key={record.id} className="flex items-center gap-3 p-2 rounded-lg bg-gray-50 dark:bg-dark-800/40 hover:bg-gray-100 dark:hover:bg-dark-800 transition-colors">
           {record.thumbnail ? (
-            <img
+            <Image
               src={record.thumbnail}
               alt="Face"
+              width={44}
+              height={44}
+              unoptimized
               className="w-11 h-11 rounded-lg object-cover flex-shrink-0 ring-1 ring-gray-200 dark:ring-gray-700"
             />
           ) : (

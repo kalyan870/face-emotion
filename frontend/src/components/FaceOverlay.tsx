@@ -11,7 +11,7 @@ interface FaceData {
 
 interface FaceOverlayProps {
   faces: FaceData[]
-  videoRef: React.RefObject<HTMLVideoElement>
+  videoRef: React.RefObject<HTMLVideoElement | null>
 }
 
 const EMOTION_COLORS: Record<string, string> = {
