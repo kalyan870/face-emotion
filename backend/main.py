@@ -1,19 +1,21 @@
-import base64
 import json
 import logging
 import os
 import time
+from io import BytesIO
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
 import cv2
 import numpy as np
 import mediapipe as mp
+from PIL import Image
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
 from mediapipe.tasks import python as mp_python
 from mediapipe.tasks.python import vision
+from security import MAX_IMAGE_BYTES, allowed_origins, decode_image_payload, origin_is_allowed
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -22,8 +24,8 @@ app = FastAPI(title="Face Emotion Recognition API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=list(allowed_origins()),
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -208,11 +210,19 @@ async def health():
 
 def decode_base64_image(base64_string: str) -> Optional[np.ndarray]:
     try:
-        if "," in base64_string:
-            base64_string = base64_string.split(",")[1]
-        img_data = base64.b64decode(base64_string)
-        np_arr = np.frombuffer(img_data, np.uint8)
-        return cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+        img_data = decode_image_payload(base64_string)
+        if img_data is None or len(img_data) > MAX_IMAGE_BYTES:
+            return None
+        with Image.open(BytesIO(img_data)) as image:
+            width, height = image.size
+            if width < 1 or height < 1 or width > 1920 or height > 1080:
+                return None
+            rgb = np.asarray(image.convert("RGB"))
+        frame = cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
+        height, width = frame.shape[:2]
+        if width > 1920 or height > 1080:
+            return None
+        return frame
     except Exception as e:
         logger.error(f"Error decoding image: {e}")
         return None
@@ -220,11 +230,21 @@ def decode_base64_image(base64_string: str) -> Optional[np.ndarray]:
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
+    if not origin_is_allowed(websocket.headers.get("origin")):
+        await websocket.close(code=1008, reason="Origin is not allowed")
+        return
     await manager.connect(websocket)
     try:
         while True:
             data = await websocket.receive_text()
-            message = json.loads(data)
+            if len(data) > 7 * 1024 * 1024:
+                await websocket.close(code=1009, reason="Message is too large")
+                break
+            try:
+                message = json.loads(data)
+            except json.JSONDecodeError:
+                await websocket.close(code=1003, reason="Invalid JSON")
+                break
 
             if message.get("type") == "frame":
                 image_data = message.get("data", "")

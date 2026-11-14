@@ -56,6 +56,8 @@ export default function HomePage() {
   const thumbCanvasRef = useRef<HTMLCanvasElement>(null)
   const wsRef = useRef<WebSocket | null>(null)
   const animationRef = useRef<number | null>(null)
+  const processLoopRef = useRef<() => void>(() => {})
+  const connectWebSocketRef = useRef<() => void>(() => {})
   const lastSentRef = useRef<number>(0)
   const idRef = useRef(0)
   const trendCountsRef = useRef<Record<string, number>>({})
@@ -147,12 +149,6 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!isActive) return
-    setSessionStart(Date.now())
-    setRecords([])
-    setTrend([])
-    trendCountsRef.current = {}
-    lastThumbRef.current = {}
-
     const interval = setInterval(() => {
       const t = Date.now()
       const total = EMOTIONS.reduce((sum, e) => sum + (trendCountsRef.current[e] || 0), 0)
@@ -193,8 +189,9 @@ export default function HomePage() {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    canvas.width = video.videoWidth
-    canvas.height = video.videoHeight
+    const scale = Math.min(1, 1280 / video.videoWidth, 720 / video.videoHeight)
+    canvas.width = Math.max(1, Math.round(video.videoWidth * scale))
+    canvas.height = Math.max(1, Math.round(video.videoHeight * scale))
     ctx.drawImage(video, 0, 0)
 
     const dataUrl = canvas.toDataURL('image/jpeg', 0.7)
@@ -209,8 +206,12 @@ export default function HomePage() {
 
   const processLoop = useCallback(() => {
     sendFrame()
-    animationRef.current = requestAnimationFrame(processLoop)
+    animationRef.current = requestAnimationFrame(() => processLoopRef.current())
   }, [sendFrame])
+
+  useEffect(() => {
+    processLoopRef.current = processLoop
+  }, [processLoop])
 
   const connectWebSocket = useCallback(() => {
     const configuredBackendUrl = (process.env.NEXT_PUBLIC_BACKEND_URL || 'localhost:8000').trim().replace(/\/+$/, '')
@@ -254,7 +255,7 @@ export default function HomePage() {
     ws.onclose = () => {
       setConnectionStatus('disconnected')
       if (isActive) {
-        setTimeout(connectWebSocket, 2000)
+        setTimeout(() => connectWebSocketRef.current(), 2000)
       }
     }
 
@@ -265,10 +266,13 @@ export default function HomePage() {
   }, [isActive, recordDetection])
 
   useEffect(() => {
+    connectWebSocketRef.current = connectWebSocket
+  }, [connectWebSocket])
+
+  useEffect(() => {
     if (isActive) {
-      setConnectionStatus('connecting')
       connectWebSocket()
-      animationRef.current = requestAnimationFrame(processLoop)
+      animationRef.current = requestAnimationFrame(() => processLoopRef.current())
     } else {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current)
@@ -286,7 +290,7 @@ export default function HomePage() {
         wsRef.current.close()
       }
     }
-  }, [isActive, connectWebSocket, processLoop])
+  }, [isActive, connectWebSocket])
 
   const startCamera = async () => {
     try {
@@ -311,6 +315,12 @@ export default function HomePage() {
               ? { w: videoRef.current.videoWidth, h: videoRef.current.videoHeight }
               : null
         )
+        setSessionStart(Date.now())
+        setRecords([])
+        setTrend([])
+        trendCountsRef.current = {}
+        lastThumbRef.current = {}
+        setConnectionStatus('connecting')
         setIsActive(true)
       }
     } catch (err) {
@@ -456,7 +466,7 @@ export default function HomePage() {
                     </div>
                     <div>
                       <h2 className="text-2xl font-semibold text-white">Camera Off</h2>
-                      <p className="mt-1 text-white/60">Click "Start Camera" to begin real-time emotion detection</p>
+                      <p className="mt-1 text-white/60">Click &quot;Start Camera&quot; to begin real-time emotion detection</p>
                     </div>
                   </div>
                 )}

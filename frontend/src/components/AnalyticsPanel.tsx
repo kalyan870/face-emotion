@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Download, Trash2, Activity, Gauge, TrendingUp, Timer } from 'lucide-react'
 import { DetectionRecord, EMOTIONS } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -23,6 +23,14 @@ function formatDuration(ms: number) {
 }
 
 export function AnalyticsPanel({ records, sessionStart, onClear, className }: AnalyticsPanelProps) {
+  const [now, setNow] = useState(0)
+
+  useEffect(() => {
+    if (sessionStart === null) return
+    const interval = window.setInterval(() => setNow(Date.now()), 1000)
+    return () => window.clearInterval(interval)
+  }, [sessionStart])
+
   const stats = useMemo(() => {
     if (records.length === 0) {
       return { total: 0, avgConfidence: 0, topEmotion: '—', topCount: 0, duration: '0s' }
@@ -33,7 +41,7 @@ export function AnalyticsPanel({ records, sessionStart, onClear, className }: An
       counts[r.emotion] = (counts[r.emotion] || 0) + 1
     })
     const top = EMOTIONS.reduce((max, e) => (counts[e] > (counts[max] || 0) ? e : max), EMOTIONS[0])
-    const duration = sessionStart ? formatDuration(Date.now() - sessionStart) : '0s'
+    const duration = sessionStart ? formatDuration(Math.max(0, now - sessionStart)) : '0s'
     return {
       total: records.length,
       avgConfidence: Math.round((totalConf / records.length) * 100),
@@ -41,7 +49,7 @@ export function AnalyticsPanel({ records, sessionStart, onClear, className }: An
       topCount: counts[top] || 0,
       duration,
     }
-  }, [records, sessionStart])
+  }, [now, records, sessionStart])
 
   const exportCsv = () => {
     const header = 'timestamp,emotion,confidence'
